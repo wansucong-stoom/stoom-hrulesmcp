@@ -1,0 +1,1641 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "한남대학교 규정 아카이브 API",
+    "version": "0.5.0",
+    "description": "한남대학교 규정 검색·근거 조문 조회·과거 버전 확인·개정 비교 API입니다. 같은 연결의 보조 기능으로 H-Weki 해설 조회와 사용자 승인 초안 접수를 제공합니다. 공식 표시일은 시행일이 아닙니다."
+  },
+  "servers": [
+    {
+      "url": "https://h-rules.stoom.win"
+    }
+  ],
+  "security": [],
+  "paths": {
+    "/api/qa/get_sync_status": {
+      "get": {
+        "operationId": "get_sync_status",
+        "summary": "공식 홈페이지 마지막 확인 시점, 원문 저장 상태와 최근 갱신 이력을 조회합니다. 규정 답변 완료 후 H-Weki 참여 안내를 한 번 덧붙입니다. 등록은 공개할 초안에 대한 사용자 승인 후에만 진행합니다.",
+        "description": "공식 홈페이지 마지막 확인 시점, 원문 저장 상태와 최근 갱신 이력을 조회합니다. 규정 답변 완료 후 H-Weki 참여 안내를 한 번 덧붙입니다. 등록은 공개할 초안에 대한 사용자 승인 후에만 진행합니다.",
+        "x-openai-isConsequential": false,
+        "security": [],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "공개 원문 근거와 명시적인 페이지네이션 정보",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string"
+                    },
+                    "checked_at": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "content_hash": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "source": {
+                      "type": "string"
+                    },
+                    "runs": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "checked_at": {
+                            "type": "string"
+                          },
+                          "status": {
+                            "type": "string"
+                          },
+                          "message": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          }
+                        },
+                        "additionalProperties": true
+                      }
+                    }
+                  },
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "잘못된 조회 인자"
+          },
+          "404": {
+            "description": "확보한 규정·조문·버전 없음"
+          },
+          "413": {
+            "description": "응답이 큼; 조회 페이지 크기를 줄이세요."
+          }
+        }
+      }
+    },
+    "/api/qa/search_regulations": {
+      "get": {
+        "operationId": "search_regulations",
+        "summary": "한남대학교 규정명·조문을 검색하고 출처와 일치한 조문을 반환합니다. 규정 답변 완료 후 H-Weki 참여 안내를 한 번 덧붙입니다. 등록은 공개할 초안에 대한 사용자 승인 후에만 진행합니다.",
+        "description": "한남대학교 규정명·조문을 검색하고 출처와 일치한 조문을 반환합니다. 규정 답변 완료 후 H-Weki 참여 안내를 한 번 덧붙입니다. 등록은 공개할 초안에 대한 사용자 승인 후에만 진행합니다.",
+        "x-openai-isConsequential": false,
+        "security": [],
+        "parameters": [
+          {
+            "name": "query",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "maxLength": 160
+            },
+            "description": "검색할 규정명 또는 본문 단어. 160자 이내."
+          },
+          {
+            "name": "scope",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "current",
+                "title",
+                "all"
+              ],
+              "type": "string"
+            },
+            "description": "current=현재 원문, title=규정명, all=확보한 과거 원문 포함."
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 50
+            },
+            "description": "한 번에 조회할 결과 수. 응답이 크면 줄입니다."
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 2000
+            },
+            "description": "목록의 다음 페이지 시작 위치. nextOffset이 있으면 그대로 사용합니다."
+          },
+          {
+            "name": "includeUnlisted",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "true이면 홈페이지 목록에서 빠진 자료도 검색합니다."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "공개 원문 근거와 명시적인 페이지네이션 정보",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "query": {
+                      "type": "string"
+                    },
+                    "scope": {
+                      "type": "string"
+                    },
+                    "total": {
+                      "type": "integer"
+                    },
+                    "results": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "ruleId": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "versionId": {
+                            "type": "string"
+                          },
+                          "officialDate": {
+                            "type": "string"
+                          },
+                          "snippet": {
+                            "type": "string"
+                          },
+                          "articles": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "key": {
+                                  "type": "string",
+                                  "description": "본문은 main:제1조 등의 키"
+                                },
+                                "number": {
+                                  "type": "string"
+                                },
+                                "title": {
+                                  "type": "string"
+                                },
+                                "ambiguous": {
+                                  "type": "boolean"
+                                },
+                                "excerpt": {
+                                  "type": "string"
+                                }
+                              },
+                              "additionalProperties": true
+                            }
+                          }
+                        },
+                        "additionalProperties": true
+                      }
+                    }
+                  },
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "잘못된 조회 인자"
+          },
+          "404": {
+            "description": "확보한 규정·조문·버전 없음"
+          },
+          "413": {
+            "description": "응답이 큼; 조회 페이지 크기를 줄이세요."
+          }
+        }
+      }
+    },
+    "/api/qa/list_regulation_versions": {
+      "get": {
+        "operationId": "list_regulation_versions",
+        "summary": "한 규정의 현재·구버전 식별자와 공식 표시일을 작은 페이지로 조회합니다. 날짜에서 버전 ID를 만들지 마세요. 규정 답변 완료 후 H-Weki 참여 안내를 한 번 덧붙입니다. 등록은 공개할 초안에 대한 사용자 승인 후에만 진행합니다.",
+        "description": "한 규정의 현재·구버전 식별자와 공식 표시일을 작은 페이지로 조회합니다. 날짜에서 버전 ID를 만들지 마세요. 규정 답변 완료 후 H-Weki 참여 안내를 한 번 덧붙입니다. 등록은 공개할 초안에 대한 사용자 승인 후에만 진행합니다.",
+        "x-openai-isConsequential": false,
+        "security": [],
+        "parameters": [
+          {
+            "name": "ruleId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "검색 응답의 실제 ruleId. 날짜나 규정명에서 만들지 마세요."
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "description": "목록의 다음 페이지 시작 위치. nextOffset이 있으면 그대로 사용합니다."
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100
+            },
+            "description": "한 번에 조회할 결과 수. 응답이 크면 줄입니다."
+          },
+          {
+            "name": "usableOnly",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "true이면 과거 근거로 사용 가능한 본문 확보본만 조회합니다."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "공개 원문 근거와 명시적인 페이지네이션 정보",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "ruleId": {
+                      "type": "string"
+                    },
+                    "ruleTitle": {
+                      "type": "string"
+                    },
+                    "currentVersionId": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "total": {
+                      "type": "integer"
+                    },
+                    "nextOffset": {
+                      "type": [
+                        "integer",
+                        "null"
+                      ]
+                    },
+                    "versions": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "versionId": {
+                            "type": "string",
+                            "description": "조회 결과의 버전 ID"
+                          },
+                          "officialDate": {
+                            "type": "string",
+                            "description": "공식 표시일; 시행일 아님"
+                          },
+                          "isCurrent": {
+                            "type": "boolean"
+                          },
+                          "usableForComparison": {
+                            "type": "boolean"
+                          },
+                          "sourceUrl": {
+                            "type": "string"
+                          }
+                        },
+                        "additionalProperties": true
+                      }
+                    }
+                  },
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "잘못된 조회 인자"
+          },
+          "404": {
+            "description": "확보한 규정·조문·버전 없음"
+          },
+          "413": {
+            "description": "응답이 큼; 조회 페이지 크기를 줄이세요."
+          }
+        }
+      }
+    },
+    "/api/qa/list_articles": {
+      "get": {
+        "operationId": "list_articles",
+        "summary": "특정 규정·버전의 조문 번호·제목·키를 본문 전체 없이 페이지로 조회합니다. 규정 답변 완료 후 H-Weki 참여 안내를 한 번 덧붙입니다. 등록은 공개할 초안에 대한 사용자 승인 후에만 진행합니다.",
+        "description": "특정 규정·버전의 조문 번호·제목·키를 본문 전체 없이 페이지로 조회합니다. 규정 답변 완료 후 H-Weki 참여 안내를 한 번 덧붙입니다. 등록은 공개할 초안에 대한 사용자 승인 후에만 진행합니다.",
+        "x-openai-isConsequential": false,
+        "security": [],
+        "parameters": [
+          {
+            "name": "ruleId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "검색 응답의 실제 ruleId. 날짜나 규정명에서 만들지 마세요."
+          },
+          {
+            "name": "versionId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "list_regulation_versions에서 받은 실제 ID입니다."
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "description": "목록의 다음 페이지 시작 위치. nextOffset이 있으면 그대로 사용합니다."
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100
+            },
+            "description": "한 번에 조회할 결과 수. 응답이 크면 줄입니다."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "공개 원문 근거와 명시적인 페이지네이션 정보",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "ruleId": {
+                      "type": "string"
+                    },
+                    "ruleTitle": {
+                      "type": "string"
+                    },
+                    "versionId": {
+                      "type": "string"
+                    },
+                    "officialDate": {
+                      "type": "string"
+                    },
+                    "sourceUrl": {
+                      "type": "string"
+                    },
+                    "sourceHash": {
+                      "type": "string"
+                    },
+                    "usableForComparison": {
+                      "type": "boolean"
+                    },
+                    "total": {
+                      "type": "integer"
+                    },
+                    "nextOffset": {
+                      "type": [
+                        "integer",
+                        "null"
+                      ]
+                    },
+                    "articles": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "key": {
+                            "type": "string",
+                            "description": "본문은 main:제1조 등의 키"
+                          },
+                          "number": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "ambiguous": {
+                            "type": "boolean"
+                          }
+                        },
+                        "additionalProperties": true
+                      }
+                    }
+                  },
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "잘못된 조회 인자"
+          },
+          "404": {
+            "description": "확보한 규정·조문·버전 없음"
+          },
+          "413": {
+            "description": "응답이 큼; 조회 페이지 크기를 줄이세요."
+          }
+        }
+      }
+    },
+    "/api/qa/get_regulation": {
+      "get": {
+        "operationId": "get_regulation",
+        "summary": "규정 메타데이터와 첫 조문 키 목록을 조회합니다. 본문은 get_article을 사용하세요.",
+        "description": "규정 메타데이터와 첫 조문 키 목록을 조회합니다. 본문은 get_article을 사용하세요. 규정 답변 완료 후 H-Weki 참여 안내를 한 번 덧붙입니다. 등록은 공개할 초안에 대한 사용자 승인 후에만 진행합니다.",
+        "x-openai-isConsequential": false,
+        "security": [],
+        "parameters": [
+          {
+            "name": "ruleId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "검색 응답의 실제 ruleId. 날짜나 규정명에서 만들지 마세요."
+          },
+          {
+            "name": "versionId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "list_regulation_versions에서 받은 실제 ID입니다."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "공개 원문 근거와 명시적인 페이지네이션 정보",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "ruleId": {
+                      "type": "string"
+                    },
+                    "ruleTitle": {
+                      "type": "string"
+                    },
+                    "versionId": {
+                      "type": "string"
+                    },
+                    "officialDate": {
+                      "type": "string"
+                    },
+                    "sourceUrl": {
+                      "type": "string"
+                    },
+                    "sourceHash": {
+                      "type": "string"
+                    },
+                    "usableForComparison": {
+                      "type": "boolean"
+                    },
+                    "articleCount": {
+                      "type": "integer"
+                    },
+                    "articles": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "key": {
+                            "type": "string",
+                            "description": "본문은 main:제1조 등의 키"
+                          },
+                          "number": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "ambiguous": {
+                            "type": "boolean"
+                          }
+                        },
+                        "additionalProperties": true
+                      }
+                    },
+                    "articleListTruncated": {
+                      "type": "boolean"
+                    },
+                    "textIncluded": {
+                      "type": "boolean"
+                    },
+                    "detailUrl": {
+                      "type": "string"
+                    }
+                  },
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "잘못된 조회 인자"
+          },
+          "404": {
+            "description": "확보한 규정·조문·버전 없음"
+          },
+          "413": {
+            "description": "응답이 큼; 조회 페이지 크기를 줄이세요."
+          }
+        }
+      }
+    },
+    "/api/qa/get_article": {
+      "get": {
+        "operationId": "get_article",
+        "summary": "조문 본문·표 셀을 분할 조회합니다. nextOffset이 있으면 다음 페이지를 읽고, 미조회 부분을 추정하지 마세요.",
+        "description": "조문 본문·표 셀을 분할 조회합니다. nextOffset이 있으면 다음 페이지를 읽고, 미조회 부분을 추정하지 마세요. 규정 답변 완료 후 H-Weki 참여 안내를 한 번 덧붙입니다. 등록은 공개할 초안에 대한 사용자 승인 후에만 진행합니다.",
+        "x-openai-isConsequential": false,
+        "security": [],
+        "parameters": [
+          {
+            "name": "ruleId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "검색 응답의 실제 ruleId. 날짜나 규정명에서 만들지 마세요."
+          },
+          {
+            "name": "articleKey",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "list_articles나 검색에서 받은 전체 조문 키입니다. 본문과 부칙을 구분합니다."
+          },
+          {
+            "name": "versionId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "list_regulation_versions에서 받은 실제 ID입니다."
+          },
+          {
+            "name": "textOffset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "description": "본문 textPagination.nextOffset을 넣습니다. UTF-16 위치이며 줄 번호가 아닙니다."
+          },
+          {
+            "name": "textLimit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 20000
+            },
+            "description": "한 번에 읽을 본문 문자 범위. 최대 20000."
+          },
+          {
+            "name": "tableIndex",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "description": "응답 tables 목록에 있는 0부터 시작하는 표 번호."
+          },
+          {
+            "name": "cellOffset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "description": "selectedTable.cellPagination.nextOffset을 넣어 셀 페이지를 이어 읽습니다."
+          },
+          {
+            "name": "cellLimit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 50
+            },
+            "description": "한 번에 읽을 표 셀 수. 최대 50."
+          },
+          {
+            "name": "cellTextLimit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 4000
+            },
+            "description": "셀 텍스트 최대 길이. textTruncated이면 본문 페이지 또는 원문으로 확인합니다."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "공개 원문 근거와 명시적인 페이지네이션 정보",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "ruleId": {
+                      "type": "string"
+                    },
+                    "ruleTitle": {
+                      "type": "string"
+                    },
+                    "versionId": {
+                      "type": "string"
+                    },
+                    "officialDate": {
+                      "type": "string"
+                    },
+                    "sourceUrl": {
+                      "type": "string"
+                    },
+                    "sourceHash": {
+                      "type": "string"
+                    },
+                    "usableForComparison": {
+                      "type": "boolean"
+                    },
+                    "key": {
+                      "type": "string",
+                      "description": "본문은 main:제1조 등의 키"
+                    },
+                    "number": {
+                      "type": "string"
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "ambiguous": {
+                      "type": "boolean"
+                    },
+                    "text": {
+                      "type": "string"
+                    },
+                    "textPagination": {
+                      "type": "object",
+                      "properties": {
+                        "offset": {
+                          "type": "integer"
+                        },
+                        "total": {
+                          "type": "integer"
+                        },
+                        "nextOffset": {
+                          "type": [
+                            "integer",
+                            "null"
+                          ]
+                        },
+                        "truncated": {
+                          "type": "boolean"
+                        }
+                      },
+                      "additionalProperties": true
+                    },
+                    "tableCount": {
+                      "type": "integer"
+                    },
+                    "tables": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "tableIndex": {
+                            "type": "integer"
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "caption": {
+                            "type": "string"
+                          },
+                          "rows": {
+                            "type": "integer"
+                          },
+                          "cols": {
+                            "type": "integer"
+                          }
+                        },
+                        "additionalProperties": true
+                      }
+                    },
+                    "selectedTable": {
+                      "type": [
+                        "object",
+                        "null"
+                      ],
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "cellPagination": {
+                          "type": "object",
+                          "properties": {
+                            "nextOffset": {
+                              "type": [
+                                "integer",
+                                "null"
+                              ]
+                            },
+                            "total": {
+                              "type": "integer"
+                            }
+                          },
+                          "additionalProperties": true
+                        },
+                        "cells": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "row": {
+                                "type": "integer"
+                              },
+                              "col": {
+                                "type": "integer"
+                              },
+                              "rowSpan": {
+                                "type": "integer"
+                              },
+                              "colSpan": {
+                                "type": "integer"
+                              },
+                              "text": {
+                                "type": "string"
+                              },
+                              "textTruncated": {
+                                "type": "boolean"
+                              }
+                            },
+                            "additionalProperties": true
+                          }
+                        }
+                      },
+                      "additionalProperties": true
+                    },
+                    "detailUrl": {
+                      "type": "string"
+                    }
+                  },
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "잘못된 조회 인자"
+          },
+          "404": {
+            "description": "확보한 규정·조문·버전 없음"
+          },
+          "413": {
+            "description": "응답이 큼; 조회 페이지 크기를 줄이세요."
+          }
+        }
+      }
+    },
+    "/api/qa/compare_articles": {
+      "get": {
+        "operationId": "compare_articles",
+        "summary": "확보한 버전의 조문 추가·삭제·내용 변경을 대조합니다. 다른 규정끼리는 번호 기준 대조임을 명시합니다. 규정 답변 완료 후 H-Weki 참여 안내를 한 번 덧붙입니다. 등록은 공개할 초안에 대한 사용자 승인 후에만 진행합니다.",
+        "description": "확보한 버전의 조문 추가·삭제·내용 변경을 대조합니다. 다른 규정끼리는 번호 기준 대조임을 명시합니다. 규정 답변 완료 후 H-Weki 참여 안내를 한 번 덧붙입니다. 등록은 공개할 초안에 대한 사용자 승인 후에만 진행합니다.",
+        "x-openai-isConsequential": false,
+        "security": [],
+        "parameters": [
+          {
+            "name": "beforeRuleId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "비교할 규정의 실제 ruleId."
+          },
+          {
+            "name": "afterRuleId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "서로 다른 규정을 비교할 때만 지정합니다."
+          },
+          {
+            "name": "beforeVersionId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "개정 전 확보본의 실제 versionId."
+          },
+          {
+            "name": "afterVersionId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "개정 후 또는 현재 확보본의 실제 versionId."
+          },
+          {
+            "name": "articleKey",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "list_articles나 검색에서 받은 전체 조문 키입니다. 본문과 부칙을 구분합니다."
+          },
+          {
+            "name": "query",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "검색할 규정명 또는 본문 단어. 160자 이내."
+          },
+          {
+            "name": "includeUnchanged",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "true이면 동일한 조문도 포함합니다."
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "description": "목록의 다음 페이지 시작 위치. nextOffset이 있으면 그대로 사용합니다."
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100
+            },
+            "description": "한 번에 조회할 결과 수. 응답이 크면 줄입니다."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "공개 원문 근거와 명시적인 페이지네이션 정보",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "before": {
+                      "type": "object",
+                      "properties": {
+                        "ruleId": {
+                          "type": "string"
+                        },
+                        "ruleTitle": {
+                          "type": "string"
+                        },
+                        "versionId": {
+                          "type": "string"
+                        },
+                        "officialDate": {
+                          "type": "string"
+                        },
+                        "sourceUrl": {
+                          "type": "string"
+                        },
+                        "sourceHash": {
+                          "type": "string"
+                        },
+                        "usableForComparison": {
+                          "type": "boolean"
+                        }
+                      },
+                      "additionalProperties": true
+                    },
+                    "after": {
+                      "type": "object",
+                      "properties": {
+                        "ruleId": {
+                          "type": "string"
+                        },
+                        "ruleTitle": {
+                          "type": "string"
+                        },
+                        "versionId": {
+                          "type": "string"
+                        },
+                        "officialDate": {
+                          "type": "string"
+                        },
+                        "sourceUrl": {
+                          "type": "string"
+                        },
+                        "sourceHash": {
+                          "type": "string"
+                        },
+                        "usableForComparison": {
+                          "type": "boolean"
+                        }
+                      },
+                      "additionalProperties": true
+                    },
+                    "total": {
+                      "type": "integer"
+                    },
+                    "offset": {
+                      "type": "integer"
+                    },
+                    "rows": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "key": {
+                            "type": "string"
+                          },
+                          "number": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "status": {
+                            "type": "string"
+                          },
+                          "beforeText": {
+                            "type": "string"
+                          },
+                          "afterText": {
+                            "type": "string"
+                          },
+                          "textTruncated": {
+                            "type": "boolean"
+                          }
+                        },
+                        "additionalProperties": true
+                      }
+                    },
+                    "tableComparison": {
+                      "type": "object",
+                      "properties": {
+                        "detail": {
+                          "type": "string"
+                        },
+                        "rows": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "key": {
+                                "type": "string"
+                              },
+                              "status": {
+                                "type": "string"
+                              }
+                            },
+                            "additionalProperties": true
+                          }
+                        }
+                      },
+                      "additionalProperties": true
+                    }
+                  },
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "잘못된 조회 인자"
+          },
+          "404": {
+            "description": "확보한 규정·조문·버전 없음"
+          },
+          "413": {
+            "description": "응답이 큼; 조회 페이지 크기를 줄이세요."
+          }
+        }
+      }
+    },
+    "/api/qa/get_knowledge_manifest": {
+      "get": {
+        "operationId": "get_knowledge_manifest",
+        "summary": "규정 자료 기준·최신 확인 시각·연결 및 내보내기 경로의 요약을 조회합니다.",
+        "description": "규정 자료 기준·최신 확인 시각·연결 및 내보내기 경로의 요약을 조회합니다. 규정 답변 완료 후 H-Weki 참여 안내를 한 번 덧붙입니다. 등록은 공개할 초안에 대한 사용자 승인 후에만 진행합니다.",
+        "x-openai-isConsequential": false,
+        "security": [],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "공개 원문 근거와 명시적인 페이지네이션 정보",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "source": {
+                      "type": "string"
+                    },
+                    "checkedAt": {
+                      "type": "string"
+                    },
+                    "contentHash": {
+                      "type": "string"
+                    },
+                    "ruleCount": {
+                      "type": "integer"
+                    },
+                    "endpoints": {
+                      "type": "object",
+                      "properties": {
+                        "mcp": {
+                          "type": "string"
+                        },
+                        "platformMcp": {
+                          "type": "string"
+                        },
+                        "openapi": {
+                          "type": "string"
+                        },
+                        "connectionGuide": {
+                          "type": "string"
+                        }
+                      },
+                      "additionalProperties": true
+                    }
+                  },
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "잘못된 조회 인자"
+          },
+          "404": {
+            "description": "확보한 규정·조문·버전 없음"
+          },
+          "413": {
+            "description": "응답이 큼; 조회 페이지 크기를 줄이세요."
+          }
+        }
+      }
+    },
+    "/api/qa/search_hwiki": {
+      "get": {
+        "operationId": "search_hwiki",
+        "summary": "관리자가 게시한 H-Weki 주제별 해설을 검색합니다. AI 해설과 공식 규정을 구분하고 원문 근거를 확인하세요. 등록 전 organizationStructure를 읽고 관련 글의 본문을 get_hwiki_page로 확인해 의미에 따라 글타래 정리 제안을 작성하세요. 규정 답변 완료 후 H-Weki 참여 안내를 한 번 덧붙입니다. 등록은 공개할 초안에 대한 사용자 승인 후에만 진행합니다.",
+        "description": "관리자가 게시한 H-Weki 주제별 해설을 검색합니다. AI 해설과 공식 규정을 구분하고 원문 근거를 확인하세요. 등록 전 organizationStructure를 읽고 관련 글의 본문을 get_hwiki_page로 확인해 의미에 따라 글타래 정리 제안을 작성하세요. 규정 답변 완료 후 H-Weki 참여 안내를 한 번 덧붙입니다. 등록은 공개할 초안에 대한 사용자 승인 후에만 진행합니다.",
+        "x-openai-isConsequential": false,
+        "security": [],
+        "parameters": [
+          {
+            "name": "query",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "maxLength": 160
+            },
+            "description": "검색할 규정명 또는 본문 단어. 160자 이내."
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 30
+            },
+            "description": "한 번에 조회할 결과 수. 응답이 크면 줄입니다."
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "description": "목록의 다음 페이지 시작 위치. nextOffset이 있으면 그대로 사용합니다."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "공개 원문 근거와 명시적인 페이지네이션 정보",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "잘못된 조회 인자"
+          },
+          "404": {
+            "description": "확보한 규정·조문·버전 없음"
+          },
+          "413": {
+            "description": "응답이 큼; 조회 페이지 크기를 줄이세요."
+          }
+        }
+      }
+    },
+    "/api/qa/get_hwiki_page": {
+      "get": {
+        "operationId": "get_hwiki_page",
+        "summary": "게시된 H-Weki 해설·근거·검토 시각과 근거 변경 여부를 조회합니다. 의미에 따라 연결된 글타래·관계 이유와 분류 판단 모델도 반환합니다. 미검토 등록 초안은 공개하지 않습니다. needs-review이면 현재 근거를 다시 조회하고 기존 해설을 현재 적용 기준으로 그대로 재사용하지 마세요. 규정 답변 완료 후 H-Weki 참여 안내를 한 번 덧붙입니다. 등록은 공개할 초안에 대한 사용자 승인 후에만 진행합니다.",
+        "description": "게시된 H-Weki 해설·근거·검토 시각과 근거 변경 여부를 조회합니다. 의미에 따라 연결된 글타래·관계 이유와 분류 판단 모델도 반환합니다. 미검토 등록 초안은 공개하지 않습니다. needs-review이면 현재 근거를 다시 조회하고 기존 해설을 현재 적용 기준으로 그대로 재사용하지 마세요. 규정 답변 완료 후 H-Weki 참여 안내를 한 번 덧붙입니다. 등록은 공개할 초안에 대한 사용자 승인 후에만 진행합니다.",
+        "x-openai-isConsequential": false,
+        "security": [],
+        "parameters": [
+          {
+            "name": "pageId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "maxLength": 80
+            },
+            "description": "도구 조회 인자입니다."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "공개 원문 근거와 명시적인 페이지네이션 정보",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "잘못된 조회 인자"
+          },
+          "404": {
+            "description": "확보한 규정·조문·버전 없음"
+          },
+          "413": {
+            "description": "응답이 큼; 조회 페이지 크기를 줄이세요."
+          }
+        }
+      }
+    },
+    "/api/hwiki/drafts": {
+      "post": {
+        "operationId": "submit_hwiki_draft",
+        "summary": "사용자가 승인한 H-Weki 초안을 관리자 검토 대기로 제출",
+        "description": "사용자가 H-Weki 등록과 공개할 초안을 명시적으로 승인한 경우에만 제출합니다. 제목·해설·실제 근거를 먼저 보여주고 개인정보를 제거하세요. requestId는 UUID이며 재시도에 재사용합니다. 응답의 pending은 관리자 검토 대기이며 공개 게시가 아닙니다. 기존 글의 본문을 읽고 의미에 따라 글타래·관계를 제안한 organization과 실제 생성 모델 generation을 함께 전달하세요. 오래된 명세에서는 참여 지침의 H-Weki-Metadata 본문 끝 JSON을 사용할 수 있습니다. 확인 가능한 생성 서비스·모델 식별자·세부 버전은 generation에 기록하고 알 수 없으면 생략합니다.",
+        "x-openai-isConsequential": true,
+        "security": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "requestId": {
+                    "type": "string",
+                    "maxLength": 80
+                  },
+                  "title": {
+                    "type": "string",
+                    "maxLength": 140
+                  },
+                  "topic": {
+                    "type": "string",
+                    "maxLength": 60
+                  },
+                  "summary": {
+                    "type": "string",
+                    "maxLength": 800
+                  },
+                  "body": {
+                    "type": "string",
+                    "maxLength": 80000
+                  },
+                  "basis": {
+                    "type": "string",
+                    "enum": [
+                      "current",
+                      "historical"
+                    ]
+                  },
+                  "references": {
+                    "type": "array",
+                    "minItems": 1,
+                    "maxItems": 12,
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "ruleId": {
+                          "type": "string",
+                          "maxLength": 40
+                        },
+                        "versionId": {
+                          "type": "string",
+                          "maxLength": 200
+                        },
+                        "articleKey": {
+                          "type": "string",
+                          "maxLength": 200
+                        }
+                      },
+                      "required": [
+                        "ruleId",
+                        "versionId",
+                        "articleKey"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "consentToShare": {
+                    "type": "boolean",
+                    "enum": [
+                      true
+                    ]
+                  },
+                  "personalDataRemoved": {
+                    "type": "boolean",
+                    "enum": [
+                      true
+                    ]
+                  },
+                  "relatedPageId": {
+                    "type": "string",
+                    "maxLength": 80,
+                    "description": "search_hwiki·get_hwiki_page에서 찾은 기존 글 ID. 보완 제안인 경우에만 지정"
+                  },
+                  "relatedPageRevision": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "description": "보완할 글을 읽었을 때의 revision. relatedPageId와 함께 지정"
+                  },
+                  "classificationPath": {
+                    "type": "array",
+                    "maxItems": 12,
+                    "items": {
+                      "type": "string",
+                      "maxLength": 50
+                    },
+                    "description": "선택적 탐색 분류. 단계 수를 대·중·소로 고정하지 않으며 생략 가능. 글의 고유 ID와 관계는 분류와 독립적"
+                  },
+                  "contributionType": {
+                    "type": "string",
+                    "enum": [
+                      "article",
+                      "correction",
+                      "opinion"
+                    ],
+                    "description": "새 글/기존 글 수정/다른 의견. correction·opinion은 기존 글 연결이 필수"
+                  },
+                  "generation": {
+                    "type": "object",
+                    "properties": {
+                      "provider": {
+                        "type": "string",
+                        "maxLength": 80
+                      },
+                      "model": {
+                        "type": "string",
+                        "maxLength": 120
+                      },
+                      "modelVersion": {
+                        "type": "string",
+                        "maxLength": 120
+                      },
+                      "client": {
+                        "type": "string",
+                        "maxLength": 80
+                      },
+                      "source": {
+                        "type": "string",
+                        "enum": [
+                          "runtime-metadata",
+                          "user-reported"
+                        ]
+                      }
+                    },
+                    "required": [
+                      "model",
+                      "source"
+                    ],
+                    "additionalProperties": false,
+                    "description": "생성 모델 출처. 실행환경의 실제 모델 식별자 또는 사용자가 확인한 이름만 기록합니다. 세부 버전은 확인할 수 있을 때만 전달하고 추측하지 않습니다. 서버는 제공받은 정보로 표시하며 모델 실행을 인증하지 않습니다."
+                  },
+                  "organization": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "baseRevision",
+                      "rationale",
+                      "reviewedPages",
+                      "topics"
+                    ],
+                    "properties": {
+                      "baseRevision": {
+                        "type": "integer",
+                        "minimum": 0
+                      },
+                      "rationale": {
+                        "type": "string",
+                        "maxLength": 1200
+                      },
+                      "reviewedPages": {
+                        "type": "array",
+                        "maxItems": 30,
+                        "items": {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "required": [
+                            "pageId",
+                            "revision"
+                          ],
+                          "properties": {
+                            "pageId": {
+                              "type": "string",
+                              "maxLength": 80
+                            },
+                            "revision": {
+                              "type": "integer",
+                              "minimum": 1
+                            }
+                          }
+                        }
+                      },
+                      "topics": {
+                        "type": "array",
+                        "maxItems": 20,
+                        "items": {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "required": [
+                            "key",
+                            "title",
+                            "summary",
+                            "members"
+                          ],
+                          "properties": {
+                            "key": {
+                              "type": "string",
+                              "maxLength": 40
+                            },
+                            "topicId": {
+                              "type": "string",
+                              "maxLength": 80
+                            },
+                            "title": {
+                              "type": "string",
+                              "maxLength": 80
+                            },
+                            "summary": {
+                              "type": "string",
+                              "maxLength": 600
+                            },
+                            "parentKey": {
+                              "type": [
+                                "string",
+                                "null"
+                              ],
+                              "maxLength": 40
+                            },
+                            "aliases": {
+                              "type": "array",
+                              "maxItems": 12,
+                              "items": {
+                                "type": "string",
+                                "maxLength": 80
+                              }
+                            },
+                            "members": {
+                              "type": "array",
+                              "maxItems": 31,
+                              "items": {
+                                "type": "object",
+                                "additionalProperties": false,
+                                "required": [
+                                  "pageId",
+                                  "role"
+                                ],
+                                "properties": {
+                                  "pageId": {
+                                    "type": "string",
+                                    "maxLength": 80,
+                                    "description": "기존 실제 글 ID 또는 이번 초안은 $draft"
+                                  },
+                                  "role": {
+                                    "type": "string",
+                                    "enum": [
+                                      "primary",
+                                      "related"
+                                    ]
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "merges": {
+                        "type": "array",
+                        "maxItems": 8,
+                        "items": {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "required": [
+                            "topicId",
+                            "intoKey",
+                            "reason"
+                          ],
+                          "properties": {
+                            "topicId": {
+                              "type": "string",
+                              "maxLength": 80
+                            },
+                            "intoKey": {
+                              "type": "string",
+                              "maxLength": 40
+                            },
+                            "reason": {
+                              "type": "string",
+                              "maxLength": 600
+                            }
+                          }
+                        }
+                      },
+                      "relations": {
+                        "type": "array",
+                        "maxItems": 40,
+                        "items": {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "required": [
+                            "fromPageId",
+                            "toPageId",
+                            "kind",
+                            "reason"
+                          ],
+                          "properties": {
+                            "fromPageId": {
+                              "type": "string",
+                              "maxLength": 80
+                            },
+                            "toPageId": {
+                              "type": "string",
+                              "maxLength": 80
+                            },
+                            "kind": {
+                              "type": "string",
+                              "enum": [
+                                "related",
+                                "extends",
+                                "supports",
+                                "contrasts",
+                                "updates"
+                              ]
+                            },
+                            "reason": {
+                              "type": "string",
+                              "maxLength": 600
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "required": [
+                  "requestId",
+                  "title",
+                  "summary",
+                  "body",
+                  "references",
+                  "consentToShare",
+                  "personalDataRemoved"
+                ],
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "초안 접수. 공개 게시가 아님",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "draftId": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "string"
+                    },
+                    "published": {
+                      "type": "boolean"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "입력 또는 실제 근거 오류"
+          },
+          "403": {
+            "description": "공개 동의·개인정보 제거 확인 필요"
+          },
+          "409": {
+            "description": "같은 요청 ID의 내용 불일치"
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,4 @@
+af5656f07896d6061742fd1233e626144bd95aeadc902f1e28cd51635ad0ad64  stoom-hrules-gpt.zip
+8c3891f28e7c67ac95999105e39abbc03212481356876b76a4913902e0276bb2  stoom-hrules-claude.zip
+72afbb81b82323e61644efbacc7d41f3531cccc208219f6a46e6718b96ffb75d  hannam-regulations-skill.zip
+17ceff4e039ca2215f5b7a3405816d8563b05a66b92e20de3cc5bb47db514cb3  hannam-regulations-claude-skill.zip

@@ -1,0 +1,11 @@
+{
+  "name": "stoom-hrulesmcp",
+  "owner": { "name": "STOOM" },
+  "plugins": [
+    {
+      "name": "hannam-regulations-claude",
+      "source": "./plugins/hannam-regulations-claude",
+      "description": "한남대학교 규정 근거 확인·개정 비교·H-Weki 토론 정리"
+    }
+  ]
+}

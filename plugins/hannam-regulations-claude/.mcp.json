@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "hannam-regulations": {
+      "type": "http",
+      "url": "https://h-rules.stoom.win/api/mcp"
+    }
+  }
+}
