@@ -26,7 +26,7 @@ MCP 도구: `get_sync_status`, `search_regulations`, `list_regulation_versions`,
 
 ## 공개 연결·GPTs 경로
 
-공개 규정 조회·H-Weki 초안 접수 MCP: https://h-rules.stoom.win/api/mcp. 기존 플랫폼 OAuth MCP는 https://hannam-regulations-wiki.esceeee.chatgpt.site/mcp 이다. h-rules.stoom.win/mcp 주소는 사용하지 않는다.
+공개 규정 조회·Weki 초안 접수 MCP: https://h-rules.stoom.win/api/mcp. 기존 플랫폼 OAuth MCP는 https://hannam-regulations-wiki.esceeee.chatgpt.site/mcp 이다. h-rules.stoom.win/mcp 주소는 사용하지 않는다.
 
 공개 MCP의 규정 조회 도구와 GET /api/qa/{toolName}은 공개 자료를 읽는다. submit_hwiki_draft만 사용자 동의 후 초안을 접수하며 관리자 게시·자료 수정 도구는 제공하지 않는다. get_regulation은 메타데이터와 첫 50개 조문 키, get_knowledge_manifest는 경로 요약을 반환한다. list_regulation_versions(ruleId, offset, limit, usableOnly)와 list_articles(ruleId, versionId, offset, limit)의 nextOffset을 따른다.
 
@@ -34,6 +34,6 @@ get_article의 textPagination.nextOffset으로 textOffset을 이어 보내고 te
 
 GPTs의 Actions에는 https://h-rules.stoom.win/openapi.json 을 가져오고, instructions에는 사이트의 /gpts-instructions.md를 사용한다. SKILL ZIP 업로드가 Actions 연결을 대신하지 않는다. 자세한 사람용 설정 안내는 /?view=knowledge 및 /connection-guide.md에 있다.
 
-## H-Weki 조회·접수
+## Weki 조회·접수
 
-게시 글은 `search_hwiki`·`get_hwiki_page`로 조회한다. 사용자 승인 초안은 `submit_hwiki_draft` 또는 `POST https://h-rules.stoom.win/api/hwiki/drafts`로 접수한다. 현재 도구 스키마를 확인하며 자세한 필드·목적지·결과 처리는 [H-Weki 전송 지침](weki-submission.md)을 따른다.
+게시 글은 `search_hwiki`·`get_hwiki_page`로 조회한다. 사용자 승인 초안은 `submit_hwiki_draft` 또는 `POST https://h-rules.stoom.win/api/hwiki/drafts`로 접수한다. 현재 도구 스키마를 확인하며 자세한 필드·목적지·결과 처리는 [Weki 전송 지침](weki-submission.md)을 따른다.

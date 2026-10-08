@@ -63,9 +63,27 @@ def validate():
     assert '$hannam-regulations' in metadata
     schema = load_json('plugins/hannam-regulations-gpt/gpts/openapi.json')
     assert schema['servers'] == [{'url': 'https://h-rules.stoom.win'}]
-    assert len(schema['paths']) == 11
-    assert '/api/hwiki/drafts' in schema['paths']
-    assert all(p.startswith('/api/qa/') or p == '/api/hwiki/drafts' for p in schema['paths'])
+    public_reads = {
+        'get_sync_status', 'search_regulations', 'list_regulation_versions',
+        'list_articles', 'get_regulation', 'get_article', 'compare_articles',
+        'get_knowledge_manifest', 'search_hwiki', 'get_hwiki_page',
+    }
+    public_writes = {
+        '/api/hwiki/drafts': 'submit_hwiki_draft',
+        '/api/hwiki/organization/proposals': 'submit_hwiki_organization',
+    }
+    assert set(schema['paths']) == {'/api/qa/' + name for name in public_reads} | set(public_writes)
+    for name in public_reads:
+        operation = schema['paths']['/api/qa/' + name]
+        assert set(operation) == {'get'}
+        assert operation['get']['operationId'] == name
+    for route, name in public_writes.items():
+        operation = schema['paths'][route]
+        assert set(operation) == {'post'}
+        assert operation['post']['operationId'] == name
+        assert operation['post']['x-openai-isConsequential'] is True
+        properties = operation['post']['requestBody']['content']['application/json']['schema']['properties']
+        assert 'publication' not in properties
     instruction = ROOT / 'plugins/hannam-regulations-gpt/gpts/instructions.md'
     assert len(instruction.read_text()) < 8000
     for base in (ROOT / 'plugins', ROOT / 'docs'):
@@ -86,7 +104,7 @@ def validate():
 def archive_bytes(folder):
     output = io.BytesIO()
     with zipfile.ZipFile(output, 'w', zipfile.ZIP_DEFLATED, compresslevel=9) as archive:
-        for path in sorted(folder.rglob('*')):
+        for path in sorted(folder.rglob('*'), key=lambda item: item.relative_to(folder).as_posix()):
             assert not path.is_symlink()
             if path.is_file():
                 info = zipfile.ZipInfo(path.relative_to(folder.parent).as_posix(), (1980, 1, 1, 0, 0, 0))

@@ -1,4 +1,4 @@
-# 공개 규정 조회·H-Weki 접수 API
+# 공개 규정 조회·Weki 접수 API
 
 이 문서는 Claude의 연결된 MCP 도구 또는 공개 HTTP API에 적용한다. 도구의 실제 스키마·응답을 우선 확인한다. 공개 조회·사용자 승인 초안 접수에는 API 키가 필요 없다. submit_hwiki_draft는 검토 대기 초안을 접수하며 관리자 게시·원문 수정 권한은 제공하지 않는다.
 
@@ -76,13 +76,13 @@ ID는 응답에서 복사한다. `main:제5조`는 본문 제5조이며 부칙�
 공개 조회 도구는 원문 조문과 확보한 버전의 비교를 제공합니다. 내부 검토 기록은 공개 조회 범위에 포함되지 않습니다. 두 규정을 비교할 때 적용 대상·시행일·예외와 근거 조문을 직접 확인합니다.
 
 
-## H-Weki 참여
+## Weki 참여
 
-규정 답변 마지막에 “이 답변을 H-Weki에 등록할까요?”와 참여 이점을 한 번 안내합니다. 등록하면 다른 구성원이 같은 질문을 다시 조사하는 시간을 줄이고, 근거 규정이 바뀔 때 해설을 함께 보완할 수 있습니다. 사용자가 원할 때 공개할 제목·해설·실제 근거를 먼저 확인하고 동의·개인정보 제거 확인 후 submit_hwiki_draft로 접수합니다. pending 초안은 비공개이며 운영자 검토 후 게시합니다. 게시 글은 search_hwiki·get_hwiki_page로 조회합니다. 새 도구가 보이지 않으면 연결 도구 목록을 Refresh하고 새 대화를 시작하세요. GPTs는 새 스키마와 GPT 지침을, 스킬은 새 ZIP으로 갱신합니다. 대화 전체를 자동 수집하지 않습니다.
+규정 답변 마지막에 “이 답변을 Weki에 등록할까요?”와 참여 이점을 한 번 안내합니다. 등록하면 다른 구성원이 같은 질문을 다시 조사하는 시간을 줄이고, 근거 규정이 바뀔 때 해설을 함께 보완할 수 있습니다. 사용자가 원할 때 공개할 제목·해설·실제 근거를 먼저 확인하고 동의·개인정보 제거 확인 후 submit_hwiki_draft로 접수합니다. pending 초안은 비공개이며 운영자 검토 후 게시합니다. 게시 글은 search_hwiki·get_hwiki_page로 조회합니다. 새 도구가 보이지 않으면 연결 도구 목록을 Refresh하고 새 대화를 시작하세요. GPTs는 새 스키마와 GPT 지침을, 스킬은 새 ZIP으로 갱신합니다. 대화 전체를 자동 수집하지 않습니다.
 
 참여 안내: https://h-rules.stoom.win/hwiki-participation.md
-H-Weki 화면: https://h-rules.stoom.win/?view=hwiki
+Weki 화면: https://h-rules.stoom.win/?view=hwiki
 
-## H-Weki 조회·접수
+## Weki 조회·접수
 
-게시 글은 `search_hwiki`·`get_hwiki_page`로 조회한다. 사용자 승인 초안은 `submit_hwiki_draft` 또는 `POST https://h-rules.stoom.win/api/hwiki/drafts`로 접수한다. 현재 도구 스키마를 확인하며 자세한 필드·목적지·결과 처리는 [H-Weki 전송 지침](weki-submission.md)을 따른다.
+게시 글은 `search_hwiki`·`get_hwiki_page`로 조회한다. 사용자 승인 초안은 `submit_hwiki_draft` 또는 `POST https://h-rules.stoom.win/api/hwiki/drafts`로 접수한다. 현재 도구 스키마를 확인하며 자세한 필드·목적지·결과 처리는 [Weki 전송 지침](weki-submission.md)을 따른다.

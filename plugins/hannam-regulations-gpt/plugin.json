@@ -1,18 +1,20 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "hannam-regulations-gpt",
-  "version": "1.0.0",
-  "description": "한남대학교 규정 검색·근거 조문 확인·개정 비교와 승인된 H-Weki 토론 정리를 위한 MCP 및 스킬",
-  "author": { "name": "STOOM" },
+  "version": "1.0.1",
+  "description": "한남대FLOW: 규정 근거 조회·개정 비교와 승인된 Weki 공유",
+  "author": {
+    "name": "STOOM"
+  },
   "extensions": {
     "com.openai": {
       "interface": {
-        "displayName": "한남대학교 규정 아카이브",
+        "displayName": "한남대FLOW",
         "shortDescription": "규정 근거 확인과 토론 정리",
-        "longDescription": "공개 MCP로 규정과 개정 이력을 조회하고, 근거를 확인해 답변합니다. 토론 결과는 개인정보를 제거하고 공개 승인 후 H-Weki 검토 대기 초안으로 접수합니다.",
+        "longDescription": "공개 MCP로 규정과 개정 이력을 조회하고, 근거를 확인해 답변합니다. 토론 결과는 개인정보를 제거하고 공개 승인 후 Weki 검토 대기 초안으로 접수합니다.",
         "developerName": "STOOM",
         "category": "Productivity",
-        "defaultPrompt": "한남대학교 규정 아카이브에서 관련 규정과 근거 조문을 확인해줘."
+        "defaultPrompt": "한남대FLOW에서 관련 규정과 근거 조문을 확인해줘."
       }
     }
   }

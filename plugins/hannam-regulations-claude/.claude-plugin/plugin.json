@@ -1,8 +1,10 @@
 {
   "name": "hannam-regulations-claude",
-  "version": "1.0.0",
-  "description": "한남대학교 규정 근거 확인·개정 비교·H-Weki 토론 정리",
-  "author": { "name": "STOOM" },
+  "version": "1.0.1",
+  "description": "한남대FLOW: 규정 근거 조회·개정 비교와 승인된 Weki 공유",
+  "author": {
+    "name": "STOOM"
+  },
   "homepage": "https://h-rules.stoom.win/?view=knowledge",
   "repository": "https://github.com/wansucong-stoom/stoom-hrulesmcp"
 }

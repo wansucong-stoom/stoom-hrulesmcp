@@ -1,12 +1,12 @@
 # 환경별 설치
 
-배포판 1.0.0 · 확인일 2026-10-08. 제품 메뉴와 설치 지원 범위는 계정·앱 버전·조직 정책에 따라 달라질 수 있습니다.
+배포판 1.0.1 · 확인일 2026-10-08. 제품 메뉴와 설치 지원 범위는 계정·앱 버전·조직 정책에 따라 달라질 수 있습니다.
 
 ## GPT·Codex 통합 설치
 
 1. 설치 기능을 지원하는 ChatGPT 데스크톱·Codex에 저장소 주소와 README의 설치 요청 문구를 전달합니다.
 2. 명령을 직접 쓰는 경우 `codex plugin marketplace add wansucong-stoom/stoom-hrulesmcp --ref main`으로 출처를 등록합니다.
-3. ChatGPT 데스크톱의 Plugins Directory에서 **STOOM 한남대학교 규정 아카이브** 출처와 `hannam-regulations-gpt`를 찾아 설치합니다. 새 대화에서 플러그인과 스킬을 확인합니다.
+3. ChatGPT 데스크톱의 Plugins Directory에서 **한남대FLOW** 출처와 `hannam-regulations-gpt`를 찾아 설치합니다. 새 대화에서 플러그인과 스킬을 확인합니다.
 4. 표시되는 연결 승인을 완료하고 아래 첫 질문으로 실제 도구 호출을 확인합니다.
 
 ZIP을 사용하는 경우 `dist/stoom-hrules-gpt.zip`을 풀면 `hannam-regulations-gpt/plugin.json`, `mcp.json`, `skills/`가 나옵니다. 로컬 마켓플레이스의 `source.path`를 이 플러그인 폴더에 연결합니다. 다른 마켓플레이스 설정을 덮어쓰지 말고 기존 설정에 항목을 추가합니다.
@@ -43,7 +43,7 @@ claude mcp add --transport http --scope user hannam-regulations https://h-rules.
 
 ## Claude 웹·Desktop·Cowork
 
-1. Customize → Connectors → Add custom connector에서 이름 **한남대학교 규정**과 URL `https://h-rules.stoom.win/api/mcp`를 추가합니다. 인증은 No sign in입니다. 조직 계정은 관리자가 먼저 커넥터를 허용해야 할 수 있습니다.
+1. Customize → Connectors → Add custom connector에서 이름 **한남대FLOW**와 URL `https://h-rules.stoom.win/api/mcp`를 추가합니다. 인증은 No sign in입니다. 조직 계정은 관리자가 먼저 커넥터를 허용해야 할 수 있습니다.
 2. `dist/hannam-regulations-claude-skill.zip`을 받아 Customize → Skills → Create skill → Upload a skill에서 올리고 켭니다. 필요한 Code execution and file creation 기능도 허용합니다.
 3. 새 대화에서 커넥터를 켜고 규정 질문을 보냅니다.
 
@@ -51,7 +51,7 @@ claude mcp add --transport http --scope user hannam-regulations https://h-rules.
 
 ## 첫 질문과 확인
 
-> 연결한 한남대학교 규정 아카이브에서 학칙의 졸업 관련 조문을 찾아줘. 마지막 자료 확인 시각, 규정명, 조문 번호, 버전의 공식 표시일과 공식 원문 링크를 함께 알려줘.
+> 연결한 한남대FLOW에서 학칙의 졸업 관련 조문을 찾아줘. 마지막 자료 확인 시각, 규정명, 조문 번호, 버전의 공식 표시일과 공식 원문 링크를 함께 알려줘.
 
 실제 `get_sync_status` → `search_regulations` → `list_articles` → `get_article` 호출과 출처를 확인합니다. 설치됐다는 답변만으로 연결 성공을 판단하지 않습니다. 규정 DB 인증은 없지만 AI 서비스 자체의 계정과 사용 권한은 필요합니다.
 
@@ -59,7 +59,7 @@ claude mcp add --transport http --scope user hannam-regulations https://h-rules.
 
 Claude Code는 `claude plugin marketplace update stoom-hrulesmcp` 후 `claude plugin update hannam-regulations-claude@stoom-hrulesmcp`를 실행합니다. Codex 마켓플레이스는 `codex plugin marketplace upgrade stoom-hrulesmcp`로 새로고침하고 설치된 플러그인을 갱신합니다. ZIP 설치는 새 파일로 기존 설치를 갱신합니다. GPTs는 최신 Actions 스키마와 지침을 다시 가져옵니다.
 
-규정 데이터는 질문 시 서버에서 조회합니다. 플러그인·스킬·GPT 지침 파일은 새 릴리스를 설치해야 바뀝니다. 오래된 H-Weki 해설은 현재 규정 조문·부칙과 비교합니다.
+규정 데이터는 질문 시 서버에서 조회합니다. 플러그인·스킬·GPT 지침 파일은 새 릴리스를 설치해야 바뀝니다. 오래된 Weki 해설은 현재 규정 조문·부칙과 비교합니다.
 
 - 404: 서버 URL의 `/api/mcp`를 확인합니다.
 - 401·OAuth 오류: 공개 서버와 기존 플랫폼 OAuth 주소를 혼용했는지 확인합니다.

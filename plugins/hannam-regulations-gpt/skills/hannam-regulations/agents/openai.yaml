@@ -1,11 +1,11 @@
 interface:
-  display_name: "한남대학교 규정 아카이브"
-  short_description: "한남대학교 규정 검색·근거 조문 조회·개정 비교를 위한 AI 연결 지침"
-  default_prompt: "$hannam-regulations를 사용해 관련 규정과 근거 조문을 조회하고 개정 이력·출처를 확인해줘."
+  display_name: "한남대FLOW"
+  short_description: "한남대FLOW 규정 조회·개정 비교와 Weki 공유를 위한 AI 연결 지침"
+  default_prompt: "$hannam-regulations로 한남대FLOW에서 관련 규정과 근거 조문을 조회하고 개정 이력·출처를 확인해줘."
 dependencies:
   tools:
     - type: "mcp"
       value: "hannam-regulations"
-      description: "한남대학교 규정 아카이브의 원문 검색·조문 조회·버전 확인·개정 비교 도구"
+      description: "한남대FLOW의 원문 검색·조문 조회·버전 확인·개정 비교 도구"
       transport: "streamable_http"
       url: "https://h-rules.stoom.win/api/mcp"

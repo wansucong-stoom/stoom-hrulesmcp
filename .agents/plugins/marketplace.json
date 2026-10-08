@@ -1,11 +1,19 @@
 {
   "name": "stoom-hrulesmcp",
-  "interface": { "displayName": "STOOM 한남대학교 규정 아카이브" },
+  "interface": {
+    "displayName": "한남대FLOW"
+  },
   "plugins": [
     {
       "name": "hannam-regulations-gpt",
-      "source": { "source": "local", "path": "./plugins/hannam-regulations-gpt" },
-      "policy": { "installation": "AVAILABLE", "authentication": "ON_INSTALL" },
+      "source": {
+        "source": "local",
+        "path": "./plugins/hannam-regulations-gpt"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
       "category": "Productivity"
     }
   ]
