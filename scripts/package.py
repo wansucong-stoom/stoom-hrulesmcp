@@ -67,6 +67,7 @@ def validate():
         'get_sync_status', 'search_regulations', 'list_regulation_versions',
         'list_articles', 'get_regulation', 'get_article', 'compare_articles',
         'get_knowledge_manifest', 'search_hwiki', 'get_hwiki_page',
+        'list_disclosure_datasets', 'list_disclosure_versions', 'query_disclosure_data',
     }
     public_writes = {
         '/api/hwiki/drafts': 'submit_hwiki_draft',

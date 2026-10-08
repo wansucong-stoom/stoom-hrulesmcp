@@ -37,3 +37,14 @@ GPTs의 Actions에는 https://h-rules.stoom.win/openapi.json 을 가져오고, i
 ## Weki 조회·접수
 
 게시 글은 `search_hwiki`·`get_hwiki_page`로 조회한다. 사용자 승인 초안은 `submit_hwiki_draft` 또는 `POST https://h-rules.stoom.win/api/hwiki/drafts`로 접수한다. 현재 도구 스키마를 확인하며 자세한 필드·목적지·결과 처리는 [Weki 전송 지침](weki-submission.md)을 따른다.
+
+## 대학알리미 공시자료와 작성 기준
+
+- 화면: https://h-rules.stoom.win/disclosures.html · 자료 목록: https://h-rules.stoom.win/api/disclosures
+- 외부 수집 API 키는 사용하지 않습니다. 공식 요약파일 42종, 학교 개황·교육편제·교육과정의 파일 보존본을 조회합니다.
+- `list_disclosure_datasets`에서 범위를 확인하고 `query_disclosure_data`에 `datasetId`, `schoolCode`를 지정합니다. 한남대 학교코드는 문자열 `0000195`이며 대표학교코드와 구별합니다. 이름이 바뀐 학교는 코드로 조회합니다.
+- `publicationYear`는 공시연도, `referenceYear`와 `referencePeriod`는 실제 기준기간입니다. `surveyYear`·조사차수·기준일은 별도입니다. 기존 `year` 인자는 공시연도를 뜻합니다. 원문에 없는 기간을 추정하지 않습니다.
+- 학과는 `schoolCode`와 `departmentCode`로 조회하며 현재 교육편제의 이름·상태로 과거 통계를 덮어쓰지 않습니다. 교육과정은 행수와 고유 교과목 수를 구별합니다. 전체 조회는 `nextOffset`을 따르고 교육과정의 본문검색은 학교를 먼저 선택합니다.
+- `notes`, `sourceMetadata`, `timeSemantics`, `guidanceReferences`의 단위·분모·모집단·적용 연도를 읽습니다. 대학원 기관을 제외해도 학부+대학원 합산 열은 합산 지표입니다. 원문 0과 미기재(null)는 다릅니다.
+- 2026 지침: https://h-rules.stoom.win/disclosure-guide-2026.html . 2026판의 정의는 공시연도 2026에만 연결합니다. 과거 판의 미확인 정의를 2026 기준으로 대체하지 않습니다. 42개 중 23개 항목군을 대조했으며 미검토 항목은 그 상태를 유지합니다.
+- `list_disclosure_versions`의 보존본·지문을 함께 인용합니다. 공개 MCP·Actions는 아카이브를 읽는 기능이며 외부 자료 수집이나 관리 작업을 실행하지 않습니다.
